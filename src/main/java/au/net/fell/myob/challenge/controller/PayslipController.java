@@ -1,7 +1,8 @@
 package au.net.fell.myob.challenge.controller;
 
-import au.net.fell.myob.challenge.model.PayslipRequestModel;
-import au.net.fell.myob.challenge.model.PayslipResponseModel;
+import au.net.fell.myob.challenge.model.PayslipRequest;
+import au.net.fell.myob.challenge.model.Payslip;
+import au.net.fell.myob.challenge.service.PayslipFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,12 +14,12 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 public class PayslipController {
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private PayslipFactory payslipFactory;
 
-    // endpoint uses a PUT method, as it is an idempotent operation
+    // endpoint uses the PUT method, as it is an idempotent operation
     @RequestMapping(value = "/payslip", method = PUT)
     @ResponseBody
-    public PayslipResponseModel generatePayslip(@RequestBody PayslipRequestModel request) throws Exception {
-        return new PayslipResponseModel();
+    public Payslip generatePayslip(@RequestBody PayslipRequest request) throws Exception {
+        return payslipFactory.generatePayslip(request);
     }
 }

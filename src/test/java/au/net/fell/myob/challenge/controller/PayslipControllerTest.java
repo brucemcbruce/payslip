@@ -1,7 +1,7 @@
 package au.net.fell.myob.challenge.controller;
 
-import au.net.fell.myob.challenge.model.PayslipRequestModel;
-import au.net.fell.myob.challenge.model.PayslipResponseModel;
+import au.net.fell.myob.challenge.model.Payslip;
+import au.net.fell.myob.challenge.model.PayslipRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.fail;
@@ -33,9 +35,9 @@ public class PayslipControllerTest {
     public void getHello() throws Exception {
         mvc.perform(MockMvcRequestBuilders.put("/payslip").
                 accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).
-                content(toJson(new PayslipRequestModel()))
+                content(toJson(validPayslipRequest()))
         ).andExpect(status().isOk()).
-                andExpect(content().string(equalTo(expectedResponse())));
+                andExpect(content().string(equalTo(toJson(expectedResponse()))));
     }
 
     private String toJson(Object model) {
@@ -47,7 +49,26 @@ public class PayslipControllerTest {
         }
     }
 
-    private String expectedResponse() {
-        return toJson(new PayslipResponseModel());
+    private Object validPayslipRequest() {
+        PayslipRequest request = new PayslipRequest();
+        request.setFirstName("David");
+        request.setLastName("Rudd");
+        request.setAnnualSalary(60050);
+        request.setSuperRate(9);
+        request.setPaymentDate(LocalDate.of(2017, 3,1));
+        return request;
     }
+
+    private Payslip expectedResponse() {
+        Payslip response = new Payslip();
+        response.setName("David Rudd");
+        response.setPayPeriodStart(LocalDate.of(2017,3,1));
+        response.setPayPeriodEnd(LocalDate.of(2017,3,31));
+        response.setGrossIncome(5004);
+        response.setIncomeTax(922);
+        response.setNetIncome(4082);
+        response.setSuperannuation(450);
+        return response;
+    }
+
 }

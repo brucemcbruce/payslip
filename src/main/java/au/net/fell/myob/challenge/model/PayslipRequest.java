@@ -2,7 +2,7 @@ package au.net.fell.myob.challenge.model;
 
 import java.time.LocalDate;
 
-public class PayslipRequestModel {
+public class PayslipRequest {
     private String firstName;
     private String lastName;
     private int annualSalary;
