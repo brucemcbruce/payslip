@@ -2,6 +2,7 @@ package au.net.fell.myob.challenge.service;
 
 import au.net.fell.myob.challenge.model.Payslip;
 import au.net.fell.myob.challenge.model.PayslipRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -13,6 +14,14 @@ import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 
 @Service
 public class PayslipFactory {
+
+    private final IncomeTaxCalculator incomeTaxCalculator;
+
+    @Autowired
+    public PayslipFactory(IncomeTaxCalculator incomeTaxCalculator) {
+        this.incomeTaxCalculator = incomeTaxCalculator;
+    }
+
     public Payslip generatePayslip(PayslipRequest request) {
         Payslip payslip = new Payslip();
         payslip.setName(mapName(request));
@@ -46,13 +55,8 @@ public class PayslipFactory {
     }
 
     private int mapIncomeTax(PayslipRequest request) {
-        if (request.getAnnualSalary() == 60050)
-            return 922;
-        else if (request.getAnnualSalary() == 120000)
-            return 2696;
-        else
-            throw new UnsupportedOperationException("Not yet implemented");
-    }
+        return round((float)incomeTaxCalculator.calculate(request.getAnnualSalary())/12);
+   }
 
     private int mapNetIncome(PayslipRequest request) {
         return mapGrossIncome(request) - mapIncomeTax(request);
