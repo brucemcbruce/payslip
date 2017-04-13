@@ -23,6 +23,7 @@ public class PayslipFactory {
     }
 
     public Payslip generatePayslip(PayslipRequest request) {
+        validateRequest(request);
         Payslip payslip = new Payslip();
         payslip.setName(mapName(request));
         payslip.setPayPeriodStart(mapStartDate(request));
@@ -34,20 +35,21 @@ public class PayslipFactory {
         return payslip;
     }
 
+    private void validateRequest(PayslipRequest request) {
+        checkArgument(request.getPaymentDate() != null, "Payment date must be provided in order to generate payslip");
+        checkArgument(request.getAnnualSalary() >= 0, "Salary cannot be less than zero!");
+    }
+
     private String mapName(PayslipRequest request) {
         return String.format("%s %s", request.getFirstName(), request.getLastName());
     }
 
     private LocalDate mapStartDate(PayslipRequest request) {
-        LocalDate paymentDate = request.getPaymentDate();
-        checkArgument(paymentDate != null, "Payment date must be provided in order to generate payslip");
-        return paymentDate.with(firstDayOfMonth());
+        return request.getPaymentDate().with(firstDayOfMonth());
     }
 
     private LocalDate mapEndDate(PayslipRequest request) {
-        LocalDate paymentDate = request.getPaymentDate();
-        checkArgument(paymentDate != null, "Payment date must be provided in order to generate payslip");
-        return paymentDate.with(lastDayOfMonth());
+        return request.getPaymentDate().with(lastDayOfMonth());
     }
 
     private int mapGrossIncome(PayslipRequest request) {
