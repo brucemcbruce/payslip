@@ -5,12 +5,12 @@
 
 This application is built on Java 1.8 and Gradle.
 
-Other dependencies (e.g. spring-boot) are managed by Gradle - as long as you build the application using a relatively recent version, these will be automatically downloaded.
+Other dependencies (e.g. spring-boot) are managed by Gradle - as long as you build the application using a relatively recent version of gradle, dependencies will be automatically downloaded.
 
 ### Running the application
 
 The application can be built using Gradle as the build and dependency management tool.
-Run `./gradlew clean build` from the application root directory to build a self-executable jar. The can be run using `java -jar ./build/libs/payslip.jar`
+Run `./gradlew clean build` from the application root directory to build a self-executable jar. This can be run using `java -jar ./build/libs/payslip.jar`
 
 There are 2 endpoints exposed when the application is running.
 A JSON-based endpoint for mapping a single request to a payslip, and a CSV-based endpoint for mapping payslips in bulk.

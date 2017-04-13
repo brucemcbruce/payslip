@@ -22,18 +22,18 @@ import static org.eclipse.jetty.util.StringUtil.isNotBlank;
 public class PayslipCsvMapper {
 
     private final PayslipFactory payslipFactory;
-
     private final CsvMapper csvMapper;
+
     private final CsvSchema inputSchema;
     private final CsvSchema outputSchema;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    public PayslipCsvMapper(PayslipFactory payslipFactory) {
+    public PayslipCsvMapper(PayslipFactory payslipFactory, CsvMapper csvMapper) {
         this.payslipFactory = payslipFactory;
-        this.csvMapper = new CsvMapper();
-        this.csvMapper.registerModule(new JavaTimeModule());
+        this.csvMapper = csvMapper;
+
         this.inputSchema = csvMapper.schemaFor(PayslipRequest.class);
         this.outputSchema = csvMapper.schemaFor(Payslip.class);
     }

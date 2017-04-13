@@ -1,10 +1,14 @@
 package au.net.fell.myob.challenge.service;
 
 import au.net.fell.myob.challenge.model.Payslip;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.LocalDate;
@@ -21,6 +25,14 @@ public class PayslipCsvMapperTest {
 
     @Mock
     private PayslipFactory payslipFactory;
+
+    @Spy
+    private CsvMapper csvMapper;
+
+    @Before
+    public void setUp() throws Exception {
+        csvMapper.registerModule(new JavaTimeModule());
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void onlyAttemptsToMapNonBlankStrings() {
