@@ -5,17 +5,33 @@ import au.net.fell.myob.challenge.model.PayslipRequest;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(DataProviderRunner.class)
 public class PayslipFactoryTest {
 
-    private PayslipFactory target = new PayslipFactory(new IncomeTaxCalculator());
+    @InjectMocks
+    private PayslipFactory target;
+
+    @Mock
+    private IncomeTaxCalculator incomeTaxCalculator;
+
+    @Before
+    public void setUp() throws Exception {
+        initMocks(this);
+        when(incomeTaxCalculator.calculate(anyInt())).thenReturn(123);
+    }
 
     @Test
     public void generatesPayslipFromRequest() {
@@ -69,7 +85,7 @@ public class PayslipFactoryTest {
     }
 
     @Test
-    @UseDataProvider("roundingDataProvider")
+    @UseDataProvider("grossPayDataProvider")
     public void correctlyHandlesRounding(int annualSalary, int expectedGrossIncome, String testCase) {
         PayslipRequest request = validRequest();
         request.setAnnualSalary(annualSalary);
@@ -80,8 +96,8 @@ public class PayslipFactoryTest {
     }
 
     @DataProvider
-    public static Object[][] roundingDataProvider() {
-        return new Object[][] {
+    public static Object[][] grossPayDataProvider() {
+        return new Object[][]{
                 {60050, 5004, "Provided sample case (rounding down)"},
                 {60060, 5005, "Exact value"},
                 {60070, 5006, "Value to be rounded up"},
@@ -91,26 +107,24 @@ public class PayslipFactoryTest {
 
     @Test
     @UseDataProvider("incomeTaxDataProvider")
-    public void populatesIncomeTaxBasedOnRequest(int annualSalary, int expectedIncomeTax, String testCase) {
+    public void populatesIncomeTaxBasedOnRequest(int calculatedTax, int expectedIncomeTax, String testCase) {
         PayslipRequest request = validRequest();
-        request.setAnnualSalary(60050);
+        request.setAnnualSalary(123456);
+        when(incomeTaxCalculator.calculate(123456)).thenReturn(calculatedTax);
 
         Payslip result = target.generatePayslip(request);
 
-        assertThat(result.getIncomeTax()).isEqualTo(922);
+        assertThat(result.getIncomeTax()).isEqualTo(expectedIncomeTax);
     }
 
     @DataProvider
     public static Object[][] incomeTaxDataProvider() {
         return new Object[][]{
-                {60050, 922, "Provided sample case 1"},
-                {120000, 2696, "Provided sample case 2"},
-                {18200, 0, "Tax free threshold"},
-                {18232, 1, "Smallest income that pays any tax"},
-                {37000, 298, "Top of tax bracket 1"},
-                {80000, 1462, "Top of tax bracket 2"},
-                {180000, 4546, "Top of tax bracket 3"},
-                {250000, 7171, "High income earner"},
+                {11063, 922, "Provided sample case"},
+                {1200, 100, "No rounding"},
+                {1215, 101, "Round down"},
+                {1221, 102, "Round up"},
+                {1230, 103, "Exactly half-way (round up)"},
         };
     }
 
@@ -118,6 +132,7 @@ public class PayslipFactoryTest {
     public void populatesNetIncomeBasedOnRequest() {
         PayslipRequest request = validRequest();
         request.setAnnualSalary(60050);
+        when(incomeTaxCalculator.calculate(60050)).thenReturn(11063);
 
         Payslip result = target.generatePayslip(request);
 
