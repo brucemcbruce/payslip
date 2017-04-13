@@ -32,7 +32,7 @@ public class PayslipControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void getHello() throws Exception {
+    public void putSinglePayslip() throws Exception {
         mvc.perform(MockMvcRequestBuilders.put("/payslip").
                 accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).
                 content(toJson(validPayslipRequest()))
@@ -69,6 +69,27 @@ public class PayslipControllerTest {
         response.setNetIncome(4082);
         response.setSuperannuation(450);
         return response;
+    }
+
+    @Test
+    public void putCsv() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.put("/payslipCsv").
+                accept("text/csv").contentType("text/csv").
+                content(validCsvRequest())
+        ).andExpect(status().isOk()).
+                andExpect(content().string(equalTo(expectedCsvResponse())));
+    }
+
+    private String validCsvRequest() {
+        return "firstName,lastName,annualIncome,superannuationRate,paymentDate\n" +
+                "David,Rudd,60050,9,2017-03-01\n" +
+                "Ryan,Chen,120000,10,2017-03-01\n";
+    }
+
+    private String expectedCsvResponse() {
+        return "name,payPeriodStart,payPeriodEnd,grossIncome,incomeTax,netIncome,superannuation\n" +
+                "\"David Rudd\",2017-03-01,2017-03-31,5004,922,4082,450\n" +
+                "\"Ryan Chen\",2017-03-01,2017-03-31,10000,2696,7304,1000\n";
     }
 
 }

@@ -1,12 +1,20 @@
 package au.net.fell.myob.challenge.model;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import java.time.LocalDate;
 
+@JsonPropertyOrder({"firstName", "lastName", "annualSalary", "superRate", "paymentDate"})
 public class PayslipRequest {
+
     private String firstName;
+
     private String lastName;
+
     private int annualSalary;
+
     private int superRate;
+
     private LocalDate paymentDate;
 
     public String getFirstName() {

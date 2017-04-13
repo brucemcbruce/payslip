@@ -1,14 +1,27 @@
 package au.net.fell.myob.challenge.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import java.time.LocalDate;
 
+@JsonPropertyOrder({"name", "payPeriodStart", "payPeriodEnd", "grossIncome", "incomeTax", "netIncome", "superannuation"})
 public class Payslip {
+
     private String name;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate payPeriodStart;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate payPeriodEnd;
+
     private int grossIncome;
+
     private int incomeTax;
+
     private int netIncome;
+
     private int superannuation;
 
     public String getName() {
